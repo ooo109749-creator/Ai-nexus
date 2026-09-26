@@ -1,0 +1,1292 @@
+```html
+<!DOCTYPE html>
+<html lang="ru" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Universal AI Nexus - Любые модели и API</title>
+  
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              50: '#eef2ff',
+              100: '#e0e7ff',
+              500: '#6366f1',
+              600: '#4f46e5',
+              700: '#4338ca',
+            }
+          }
+        }
+      }
+    }
+  </script>
+  
+  <!-- Markdown & Syntax Highlighting -->
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+
+  <!-- Google Fonts Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+    }
+    code, pre {
+      font-family: 'JetBrains Mono', monospace;
+    }
+    .custom-scrollbar::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb {
+      background: rgba(156, 163, 175, 0.25);
+      border-radius: 9999px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+      background: rgba(156, 163, 175, 0.45);
+    }
+    .prose pre {
+      background: #18181b !important;
+      border: 1px solid #27272a;
+      border-radius: 0.75rem;
+      padding: 1rem;
+      position: relative;
+      margin: 0.75rem 0;
+      overflow-x: auto;
+    }
+    .prose code:not(pre code) {
+      background: rgba(99, 102, 241, 0.15);
+      color: #a5b4fc;
+      padding: 0.15rem 0.4rem;
+      border-radius: 0.375rem;
+      font-size: 0.875em;
+    }
+    .prose p {
+      margin-bottom: 0.75rem;
+      line-height: 1.65;
+    }
+    .prose ul, .prose ol {
+      margin-left: 1.25rem;
+      margin-bottom: 0.75rem;
+    }
+    .prose ul { list-style-type: disc; }
+    .prose ol { list-style-type: decimal; }
+    .prose table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 1rem 0;
+    }
+    .prose th, .prose td {
+      border: 1px solid #3f3f46;
+      padding: 0.5rem 0.75rem;
+      text-align: left;
+    }
+    .prose th {
+      background-color: #27272a;
+    }
+  </style>
+</head>
+
+<body class="bg-zinc-950 text-zinc-100 h-screen w-screen overflow-hidden flex flex-col antialiased select-none">
+  <header class="h-14 border-b border-zinc-800 bg-zinc-900/90 backdrop-blur px-4 flex items-center justify-between shrink-0 z-30">
+    <div class="flex items-center gap-3">
+      <!-- Mobile sidebar toggle -->
+      <button id="btnToggleSidebar" class="p-2 hover:bg-zinc-800 rounded-lg md:hidden text-zinc-400 hover:text-zinc-200 transition">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
+      </button>
+
+      <div class="flex items-center gap-2.5">
+        <div class="w-8 h-8 rounded-lg bg-gradient-to-tr from-indigo-600 via-indigo-500 to-purple-500 flex items-center justify-center shadow-lg shadow-indigo-500/20">
+          <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+        </div>
+        <div>
+          <h1 class="text-sm font-semibold tracking-wide flex items-center gap-1.5">
+            Universal AI Nexus
+            <span class="text-[10px] font-medium bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 px-1.5 py-0.5 rounded-full">v2.0</span>
+          </h1>
+          <p class="text-[11px] text-zinc-400 hidden sm:block">Подключение любых API, моделей и локальных серверов</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Active Profile & Settings Actions -->
+    <div class="flex items-center gap-2">
+      <!-- Active Provider Badge / Quick Selector -->
+      <div class="relative">
+        <button id="btnQuickSelectProfile" class="flex items-center gap-2 px-3 py-1.5 bg-zinc-800/80 hover:bg-zinc-800 border border-zinc-700/80 rounded-xl text-xs font-medium transition">
+          <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+          <span id="currentProfileLabel" class="max-w-[130px] sm:max-w-[180px] truncate text-zinc-200">Atria ASI</span>
+          <svg class="w-3.5 h-3.5 text-zinc-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+        </button>
+
+        <!-- Dropdown menu for profiles -->
+        <div id="quickProfileDropdown" class="hidden absolute right-0 mt-2 w-64 bg-zinc-900 border border-zinc-800 rounded-xl shadow-2xl p-1.5 z-50">
+          <div class="text-[11px] font-semibold text-zinc-400 uppercase tracking-wider px-2.5 py-1.5">Провайдеры API</div>
+          <div id="quickProfileList" class="space-y-0.5 max-h-56 overflow-y-auto custom-scrollbar">
+            <!-- Populated by JS -->
+          </div>
+          <div class="border-t border-zinc-800 mt-1.5 pt-1.5">
+            <button id="btnOpenProfilesFromDropdown" class="w-full text-left flex items-center gap-2 px-2.5 py-1.5 text-xs text-indigo-400 hover:bg-indigo-500/10 rounded-lg transition font-medium">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/></svg>
+              Управление провайдерами & API
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Settings button -->
+      <button id="btnOpenSettings" class="p-2 hover:bg-zinc-800 rounded-xl text-zinc-400 hover:text-zinc-200 transition" title="Настройки API и провайдеров">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+      </button>
+    </div>
+  </header>
+
+  <div class="flex-1 flex overflow-hidden relative">
+    
+    <!-- Sidebar / Chat History -->
+    <aside id="sidebar" class="fixed md:static inset-y-0 left-0 z-40 w-72 bg-zinc-900/95 md:bg-zinc-900 border-r border-zinc-800 flex flex-col -translate-x-full md:translate-x-0 transition-transform duration-300">
+      
+      <!-- New Chat Button -->
+      <div class="p-3 border-b border-zinc-800/80">
+        <button id="btnNewChat" class="w-full flex items-center justify-center gap-2 py-2.5 px-4 bg-indigo-600 hover:bg-indigo-500 active:scale-[0.98] text-white text-xs font-semibold rounded-xl shadow-lg shadow-indigo-600/20 transition">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+          Новый диалог
+        </button>
+      </div>
+
+      <!-- Chats List -->
+      <div class="flex-1 overflow-y-auto custom-scrollbar p-2 space-y-1" id="chatSessionsList">
+        <!-- Rendered by JS -->
+      </div>
+
+      <!-- Sidebar Footer -->
+      <div class="p-3 border-t border-zinc-800 text-[11px] text-zinc-500 flex items-center justify-between">
+        <button id="btnClearAllChats" class="hover:text-rose-400 transition flex items-center gap-1.5">
+          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+          Очистить все чаты
+        </button>
+        <span id="storageStats">0 чатов</span>
+      </div>
+    </aside>
+
+    <!-- Overlay for mobile sidebar -->
+    <div id="sidebarBackdrop" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-30 hidden md:hidden"></div>
+
+    <main class="flex-1 flex flex-col bg-zinc-950 min-w-0 relative">
+      
+      <!-- Top Conversation Info Bar -->
+      <div class="h-10 border-b border-zinc-800/60 px-4 flex items-center justify-between text-xs text-zinc-400 shrink-0 bg-zinc-950/50">
+        <div class="flex items-center gap-2 overflow-hidden">
+          <span class="text-zinc-500">Модель:</span>
+          <span id="activeModelTag" class="font-mono text-zinc-300 font-medium truncate bg-zinc-800/70 px-2 py-0.5 rounded border border-zinc-700/50 text-[11px]">gpt-4o</span>
+          <span class="text-zinc-600 hidden sm:inline">•</span>
+          <span id="activeEndpointTag" class="text-zinc-500 font-mono text-[10px] hidden sm:inline truncate max-w-xs">https://api.atria-asi.ai</span>
+        </div>
+        <div class="flex items-center gap-2">
+          <!-- System Prompt Toggle Button -->
+          <button id="btnSystemPrompt" class="hover:text-zinc-200 transition flex items-center gap-1 px-2 py-1 rounded hover:bg-zinc-800/60" title="Настроить системный промпт">
+            <svg class="w-3.5 h-3.5 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+            <span class="hidden sm:inline">Системный промпт</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Messages Scroll Area -->
+      <div id="messagesContainer" class="flex-1 overflow-y-auto custom-scrollbar p-4 md:p-6 space-y-6">
+        <!-- Rendered dynamically -->
+      </div>
+
+      <div class="p-3 md:p-4 bg-zinc-900/40 border-t border-zinc-800/80 shrink-0">
+        <div class="max-w-4xl mx-auto space-y-2">
+          
+          <!-- Input Form Box -->
+          <div class="relative bg-zinc-900/90 border border-zinc-700/80 focus-within:border-indigo-500/80 rounded-2xl p-2 transition shadow-xl shadow-black/40">
+            <textarea id="promptInput" rows="1" placeholder="Задайте вопрос модели или отправьте запрос... (Shift+Enter для новой строки)" 
+              class="w-full bg-transparent text-sm text-zinc-100 placeholder-zinc-500 resize-none outline-none custom-scrollbar px-2 py-1 max-h-48 min-h-[44px]"></textarea>
+            
+            <div class="flex items-center justify-between pt-1 border-t border-zinc-800/50 mt-1 px-1">
+              <!-- Parameters status -->
+              <div class="flex items-center gap-3 text-[11px] text-zinc-400">
+                <label class="flex items-center gap-1.5 cursor-pointer hover:text-zinc-300">
+                  <input type="checkbox" id="chkStream" checked class="rounded border-zinc-700 bg-zinc-800 text-indigo-600 focus:ring-0 w-3.5 h-3.5">
+                  <span>Стриминг</span>
+                </label>
+                <div class="hidden sm:flex items-center gap-1">
+                  <span>Temp:</span>
+                  <input type="number" id="inputTemperature" min="0" max="2" step="0.1" value="0.7" class="w-12 bg-zinc-800 border border-zinc-700 rounded px-1 py-0.5 text-center text-zinc-200 outline-none">
+                </div>
+              </div>
+
+              <!-- Buttons: Stop & Send -->
+              <div class="flex items-center gap-2">
+                <button id="btnStopGeneration" class="hidden items-center gap-1 px-3 py-1.5 bg-rose-600/20 hover:bg-rose-600/30 border border-rose-500/30 text-rose-300 text-xs font-medium rounded-xl transition">
+                  <span class="w-2 h-2 rounded-sm bg-rose-400 animate-pulse"></span>
+                  Остановить
+                </button>
+
+                <button id="btnSendMessage" class="flex items-center justify-center w-8 h-8 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white disabled:opacity-40 disabled:hover:bg-indigo-600 transition shadow-md shadow-indigo-600/20">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div class="flex items-center justify-between text-[11px] text-zinc-500 px-1">
+            <span>Поддерживает OpenAI-совместимые API, стриминг и кастомные токены</span>
+            <span id="charCount">0 символов</span>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <div id="profileModal" class="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-zinc-900 border border-zinc-800 rounded-2xl w-full max-w-2xl max-h-[90vh] flex flex-col shadow-2xl overflow-hidden">
+      <!-- Modal Header -->
+      <div class="p-4 border-b border-zinc-800 flex items-center justify-between bg-zinc-900/80">
+        <div>
+          <h2 class="text-sm font-bold text-zinc-100 flex items-center gap-2">
+            <svg class="w-4 h-4 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/></svg>
+            Настройка сайтов и API-провайдеров
+          </h2>
+          <p class="text-xs text-zinc-400">Подключайте Atria ASI, OpenAI, Groq, Ollama или собственные прокси</p>
+        </div>
+        <button id="btnCloseProfileModal" class="p-1.5 hover:bg-zinc-800 rounded-lg text-zinc-400 hover:text-zinc-200 transition">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+        </button>
+      </div>
+
+      <!-- Modal Content Area: Split into Profile List & Profile Editor -->
+      <div class="flex-1 overflow-y-auto custom-scrollbar p-5 space-y-5">
+        
+        <!-- Profile Selection / Presets bar -->
+        <div>
+          <label class="block text-xs font-semibold text-zinc-300 mb-2">Выберите или добавьте профиль:</label>
+          <div id="profileChipsContainer" class="flex flex-wrap gap-2">
+            <!-- Chips rendered here -->
+          </div>
+        </div>
+
+        <div class="border-t border-zinc-800/80 pt-4 space-y-4">
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label class="block text-xs font-medium text-zinc-400 mb-1">Название профиля</label>
+              <input id="editProfileName" type="text" placeholder="Напр. Atria ASI Production" 
+                class="w-full bg-zinc-800/90 border border-zinc-700 rounded-xl px-3 py-2 text-xs text-zinc-200 outline-none focus:border-indigo-500">
+            </div>
+            <div>
+              <label class="block text-xs font-medium text-zinc-400 mb-1">Имя модели (Model ID)</label>
+              <input id="editProfileModel" type="text" placeholder="atria-chat / gpt-4o / llama-3" 
+                class="w-full bg-zinc-800/90 border border-zinc-700 rounded-xl px-3 py-2 text-xs text-zinc-200 font-mono outline-none focus:border-indigo-500">
+            </div>
+          </div>
+
+          <div>
+            <label class="block text-xs font-medium text-zinc-400 mb-1">
+              Базовый URL сайта / API (Base URL)
+            </label>
+            <input id="editProfileUrl" type="url" placeholder="https://api.atria-asi.ai" 
+              class="w-full bg-zinc-800/90 border border-zinc-700 rounded-xl px-3 py-2 text-xs text-zinc-200 font-mono outline-none focus:border-indigo-500">
+            <span class="text-[10px] text-zinc-500 mt-1 block">Примеры: https://api.atria-asi.ai, https://api.openai.com/v1, http://localhost:11434/v1</span>
+          </div>
+
+          <div>
+            <label class="block text-xs font-medium text-zinc-400 mb-1">API Ключ (Bearer Token / Key)</label>
+            <div class="relative">
+              <input id="editProfileKey" type="password" placeholder="atr_... или sk-..." 
+                class="w-full bg-zinc-800/90 border border-zinc-700 rounded-xl px-3 py-2 text-xs text-zinc-200 font-mono outline-none focus:border-indigo-500 pr-10">
+              <button id="btnToggleKeyVisibility" class="absolute right-2.5 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-zinc-200">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+              </button>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label class="block text-xs font-medium text-zinc-400 mb-1">Путь к эндпоинту чата (Chat Path)</label>
+              <input id="editProfilePath" type="text" placeholder="/v1/chat/completions" 
+                class="w-full bg-zinc-800/90 border border-zinc-700 rounded-xl px-3 py-2 text-xs text-zinc-200 font-mono outline-none focus:border-indigo-500">
+            </div>
+            <div>
+              <label class="block text-xs font-medium text-zinc-400 mb-1">Заголовок авторизации (Header)</label>
+              <input id="editProfileAuthHeader" type="text" placeholder="Bearer {KEY}" 
+                class="w-full bg-zinc-800/90 border border-zinc-700 rounded-xl px-3 py-2 text-xs text-zinc-200 font-mono outline-none focus:border-indigo-500">
+            </div>
+          </div>
+
+          <!-- Direct Test Connection Button -->
+          <div class="p-3 bg-zinc-800/40 rounded-xl border border-zinc-800 flex items-center justify-between">
+            <div class="text-xs text-zinc-400">
+              <span id="testConnectionStatus">Проверьте работоспособность перед сохранением</span>
+            </div>
+            <button id="btnTestConnection" class="px-3 py-1.5 bg-zinc-800 hover:bg-zinc-700 text-xs font-medium text-zinc-200 rounded-lg border border-zinc-600/50 transition">
+              Проверить связь
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="p-4 border-t border-zinc-800 bg-zinc-900/90 flex items-center justify-between">
+        <button id="btnDeleteProfile" class="text-xs text-rose-400 hover:text-rose-300 font-medium px-3 py-2 rounded-lg hover:bg-rose-500/10 transition hidden">
+          Удалить профиль
+        </button>
+        <div class="flex items-center gap-2 ml-auto">
+          <button id="btnCreateNewProfile" class="px-3 py-2 bg-zinc-800 hover:bg-zinc-700 text-zinc-300 text-xs font-medium rounded-xl transition">
+            + Создать новый
+          </button>
+          <button id="btnSaveProfile" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold rounded-xl shadow-lg shadow-indigo-600/20 transition">
+            Сохранить и применить
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="systemPromptModal" class="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-zinc-900 border border-zinc-800 rounded-2xl w-full max-w-lg shadow-2xl overflow-hidden">
+      <div class="p-4 border-b border-zinc-800 flex items-center justify-between">
+        <h3 class="text-sm font-semibold text-zinc-100 flex items-center gap-2">
+          <svg class="w-4 h-4 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+          Системная инструкция (System Prompt)
+        </h3>
+        <button id="btnCloseSystemPromptModal" class="text-zinc-400 hover:text-zinc-200">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+        </button>
+      </div>
+      <div class="p-4 space-y-3">
+        <p class="text-xs text-zinc-400">Задайте роль или инструкции, которым модель должна следовать на протяжении всего диалога:</p>
+        <textarea id="systemPromptTextarea" rows="6" class="w-full bg-zinc-800/90 border border-zinc-700 rounded-xl p-3 text-xs text-zinc-200 outline-none focus:border-indigo-500 custom-scrollbar resize-none" placeholder="Ты профессиональный AI-ассистент, отвечай кратко, чётко и форматируй код..."></textarea>
+      </div>
+      <div class="p-3 border-t border-zinc-800 flex justify-end gap-2 bg-zinc-900/80">
+        <button id="btnSaveSystemPrompt" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold rounded-xl transition">
+          Сохранить
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Notification Container -->
+  <div id="toastContainer" class="fixed bottom-5 right-5 z-50 space-y-2 pointer-events-none"></div>
+
+  <script>
+    /* Global Application State */
+    const STORAGE_KEY_PROFILES = 'nexus_ai_profiles_v1';
+    const STORAGE_KEY_CHATS = 'nexus_ai_chats_v1';
+    const STORAGE_KEY_CURRENT_CHAT = 'nexus_ai_current_chat_id';
+    const STORAGE_KEY_ACTIVE_PROFILE = 'nexus_ai_active_profile_id';
+    const STORAGE_KEY_SYSTEM_PROMPT = 'nexus_ai_system_prompt';
+
+    // Default pre-loaded profiles (including the user's Atria ASI endpoint)
+    const DEFAULT_PROFILES = [
+      {
+        id: 'atria-asi-default',
+        name: 'Atria ASI (Пресет)',
+        baseUrl: 'https://api.atria-asi.ai',
+        chatPath: '/v1/chat/completions',
+        apiKey: 'atr_pO-pjU-QlXtu3TYiMXol0-Mw7XqlCUsk',
+        model: 'asi-chat',
+        authHeaderTemplate: 'Bearer {KEY}',
+        isBuiltin: true
+      },
+      {
+        id: 'openai-standard',
+        name: 'OpenAI Официальный',
+        baseUrl: 'https://api.openai.com',
+        chatPath: '/v1/chat/completions',
+        apiKey: '',
+        model: 'gpt-4o',
+        authHeaderTemplate: 'Bearer {KEY}',
+        isBuiltin: false
+      },
+      {
+        id: 'openrouter-hub',
+        name: 'OpenRouter.ai',
+        baseUrl: 'https://openrouter.ai/api',
+        chatPath: '/v1/chat/completions',
+        apiKey: '',
+        model: 'meta-llama/llama-3-8b-instruct:free',
+        authHeaderTemplate: 'Bearer {KEY}',
+        isBuiltin: false
+      },
+      {
+        id: 'groq-cloud',
+        name: 'Groq Cloud (Fast)',
+        baseUrl: 'https://api.groq.com/openai',
+        chatPath: '/v1/chat/completions',
+        apiKey: '',
+        model: 'llama3-70b-8192',
+        authHeaderTemplate: 'Bearer {KEY}',
+        isBuiltin: false
+      },
+      {
+        id: 'ollama-local',
+        name: 'Ollama (Локальный сервер)',
+        baseUrl: 'http://localhost:11434',
+        chatPath: '/v1/chat/completions',
+        apiKey: '',
+        model: 'llama3:latest',
+        authHeaderTemplate: 'Bearer {KEY}',
+        isBuiltin: false
+      }
+    ];
+
+    let profiles = [];
+    let chats = [];
+    let currentChatId = null;
+    let activeProfileId = null;
+    let abortController = null;
+    let currentlyEditingProfileId = null;
+
+    // Toast helper
+    function showToast(message, type = 'info') {
+      const container = document.getElementById('toastContainer');
+      const toast = document.createElement('div');
+      
+      const colors = {
+        info: 'bg-zinc-800 border-zinc-700 text-zinc-200',
+        success: 'bg-emerald-950/90 border-emerald-600/50 text-emerald-200',
+        error: 'bg-rose-950/90 border-rose-600/50 text-rose-200',
+        warning: 'bg-amber-950/90 border-amber-600/50 text-amber-200'
+      };
+
+      toast.className = `px-4 py-3 rounded-xl border text-xs font-medium shadow-2xl backdrop-blur transform transition-all duration-300 translate-y-4 opacity-0 pointer-events-auto flex items-center gap-2 max-w-sm ${colors[type] || colors.info}`;
+      toast.innerHTML = `
+        <span class="flex-1">${message}</span>
+        <button class="text-current opacity-60 hover:opacity-100 ml-2">&times;</button>
+      `;
+
+      toast.querySelector('button').onclick = () => {
+        toast.remove();
+      };
+
+      container.appendChild(toast);
+      
+      // Animate in
+      requestAnimationFrame(() => {
+        toast.classList.remove('translate-y-4', 'opacity-0');
+      });
+
+      // Auto dismiss
+      setTimeout(() => {
+        toast.classList.add('translate-y-4', 'opacity-0');
+        setTimeout(() => toast.remove(), 300);
+      }, 4000);
+    }
+
+    function loadState() {
+      try {
+        const storedProfiles = localStorage.getItem(STORAGE_KEY_PROFILES);
+        if (storedProfiles) {
+          profiles = JSON.parse(storedProfiles);
+        } else {
+          profiles = [...DEFAULT_PROFILES];
+          saveProfiles();
+        }
+
+        const storedChats = localStorage.getItem(STORAGE_KEY_CHATS);
+        if (storedChats) {
+          chats = JSON.parse(storedChats);
+        } else {
+          chats = [];
+        }
+
+        activeProfileId = localStorage.getItem(STORAGE_KEY_ACTIVE_PROFILE) || profiles[0]?.id;
+        currentChatId = localStorage.getItem(STORAGE_KEY_CURRENT_CHAT);
+
+        // If no chats exist, start one
+        if (chats.length === 0) {
+          createNewChat();
+        } else if (!currentChatId || !chats.find(c => c.id === currentChatId)) {
+          currentChatId = chats[0].id;
+        }
+
+        // System prompt setup
+        const savedSysPrompt = localStorage.getItem(STORAGE_KEY_SYSTEM_PROMPT);
+        if (savedSysPrompt) {
+          document.getElementById('systemPromptTextarea').value = savedSysPrompt;
+        } else {
+          document.getElementById('systemPromptTextarea').value = "Ты интеллектуальный AI-ассистент. Отвечай чётко, информативно и структурированно. Используй Markdown для списков, таблиц и кода.";
+        }
+
+      } catch (err) {
+        console.error("Ошибка загрузки данных:", err);
+        profiles = [...DEFAULT_PROFILES];
+        chats = [];
+        createNewChat();
+      }
+    }
+
+    function saveProfiles() {
+      localStorage.setItem(STORAGE_KEY_PROFILES, JSON.stringify(profiles));
+    }
+
+    function saveChats() {
+      localStorage.setItem(STORAGE_KEY_CHATS, JSON.stringify(chats));
+      updateStorageStats();
+    }
+
+    function getActiveProfile() {
+      return profiles.find(p => p.id === activeProfileId) || profiles[0];
+    }
+
+    function getCurrentChat() {
+      return chats.find(c => c.id === currentChatId);
+    }
+
+    function updateStorageStats() {
+      const statsEl = document.getElementById('storageStats');
+      if (statsEl) {
+        statsEl.textContent = `${chats.length} ${chats.length === 1 ? 'чат' : 'чатов'}`;
+      }
+    }
+
+    function renderActiveProfileUI() {
+      const active = getActiveProfile();
+      if (!active) return;
+
+      document.getElementById('currentProfileLabel').textContent = active.name;
+      document.getElementById('activeModelTag').textContent = active.model || 'без модели';
+      document.getElementById('activeEndpointTag').textContent = active.baseUrl;
+
+      // Render dropdown items
+      const dropdownContainer = document.getElementById('quickProfileList');
+      dropdownContainer.innerHTML = '';
+
+      profiles.forEach(p => {
+        const isCurrent = p.id === active.id;
+        const btn = document.createElement('button');
+        btn.className = `w-full text-left px-2.5 py-2 rounded-lg text-xs flex items-center justify-between transition ${
+          isCurrent ? 'bg-indigo-600/15 text-indigo-300 font-semibold' : 'text-zinc-300 hover:bg-zinc-800'
+        }`;
+        btn.innerHTML = `
+          <div class="truncate mr-2">
+            <div>${p.name}</div>
+            <div class="text-[10px] text-zinc-500 font-mono truncate">${p.model || 'custom'}</div>
+          </div>
+          ${isCurrent ? '<svg class="w-3.5 h-3.5 text-indigo-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>' : ''}
+        `;
+        btn.onclick = () => {
+          activeProfileId = p.id;
+          localStorage.setItem(STORAGE_KEY_ACTIVE_PROFILE, activeProfileId);
+          renderActiveProfileUI();
+          document.getElementById('quickProfileDropdown').classList.add('hidden');
+          showToast(`Переключено на: ${p.name}`, 'info');
+        };
+        dropdownContainer.appendChild(btn);
+      });
+    }
+
+    function createNewChat() {
+      const newChat = {
+        id: 'chat_' + Date.now(),
+        title: 'Новый диалог',
+        messages: [],
+        createdAt: Date.now()
+      };
+      chats.unshift(newChat);
+      currentChatId = newChat.id;
+      localStorage.setItem(STORAGE_KEY_CURRENT_CHAT, currentChatId);
+      saveChats();
+      renderChatsList();
+      renderMessages();
+      closeMobileSidebar();
+    }
+
+    function switchChat(chatId) {
+      if (abortController) {
+        abortController.abort();
+        abortController = null;
+      }
+      currentChatId = chatId;
+      localStorage.setItem(STORAGE_KEY_CURRENT_CHAT, currentChatId);
+      renderChatsList();
+      renderMessages();
+      closeMobileSidebar();
+    }
+
+    function deleteChat(chatId, e) {
+      if (e) e.stopPropagation();
+      const idx = chats.findIndex(c => c.id === chatId);
+      if (idx === -1) return;
+
+      chats.splice(idx, 1);
+      if (chats.length === 0) {
+        createNewChat();
+      } else {
+        if (currentChatId === chatId) {
+          currentChatId = chats[0].id;
+          localStorage.setItem(STORAGE_KEY_CURRENT_CHAT, currentChatId);
+        }
+        saveChats();
+        renderChatsList();
+        renderMessages();
+      }
+      showToast('Диалог удален', 'info');
+    }
+
+    function renameChat(chatId, e) {
+      if (e) e.stopPropagation();
+      const chat = chats.find(c => c.id === chatId);
+      if (!chat) return;
+
+      // Inline rename prompt via simple UI replacement
+      const newTitle = prompt('Введите новое название диалога:', chat.title);
+      if (newTitle && newTitle.trim()) {
+        chat.title = newTitle.trim();
+        saveChats();
+        renderChatsList();
+      }
+    }
+
+    function renderChatsList() {
+      const container = document.getElementById('chatSessionsList');
+      container.innerHTML = '';
+
+      chats.forEach(chat => {
+        const isActive = chat.id === currentChatId;
+        const item = document.createElement('div');
+        item.className = `group relative flex items-center justify-between p-2.5 rounded-xl cursor-pointer text-xs transition ${
+          isActive 
+            ? 'bg-zinc-800 text-zinc-100 font-medium border border-zinc-700/60 shadow-sm' 
+            : 'text-zinc-400 hover:bg-zinc-800/50 hover:text-zinc-200'
+        }`;
+
+        item.onclick = () => switchChat(chat.id);
+
+        item.innerHTML = `
+          <div class="flex items-center gap-2.5 overflow-hidden">
+            <svg class="w-4 h-4 text-zinc-400 group-hover:text-indigo-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"/></svg>
+            <span class="truncate max-w-[140px]">${escapeHtml(chat.title)}</span>
+          </div>
+          <div class="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+            <button class="btn-rename p-1 hover:text-zinc-100 rounded text-zinc-400" title="Переименовать">
+              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/></svg>
+            </button>
+            <button class="btn-delete p-1 hover:text-rose-400 rounded text-zinc-400" title="Удалить">
+              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+            </button>
+          </div>
+        `;
+
+        item.querySelector('.btn-rename').onclick = (e) => renameChat(chat.id, e);
+        item.querySelector('.btn-delete').onclick = (e) => deleteChat(chat.id, e);
+
+        container.appendChild(item);
+      });
+
+      updateStorageStats();
+    }
+
+    function escapeHtml(str) {
+      if (!str) return '';
+      return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+    }
+
+    function copyToClipboard(text) {
+      const textarea = document.createElement('textarea');
+      textarea.value = text;
+      textarea.style.position = 'fixed';
+      textarea.style.opacity = '0';
+      document.body.appendChild(textarea);
+      textarea.select();
+      try {
+        document.execCommand('copy');
+        showToast('Скопировано в буфер обмена!', 'success');
+      } catch (err) {
+        showToast('Не удалось скопировать', 'error');
+      }
+      document.body.removeChild(textarea);
+    }
+
+    function renderMarkdown(content) {
+      if (!content) return '';
+      try {
+        const rawHtml = marked.parse(content);
+        return rawHtml;
+      } catch (e) {
+        return escapeHtml(content);
+      }
+    }
+
+    function renderMessages() {
+      const chat = getCurrentChat();
+      const container = document.getElementById('messagesContainer');
+      container.innerHTML = '';
+
+      if (!chat || chat.messages.length === 0) {
+        // Empty State with Starter suggestions
+        container.innerHTML = `
+          <div class="h-full flex flex-col items-center justify-center text-center max-w-md mx-auto py-12 px-4">
+            <div class="w-14 h-14 rounded-2xl bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center mb-4 text-indigo-400">
+              <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 100-6 3 3 0 000 6z"/></svg>
+            </div>
+            <h2 class="text-base font-semibold text-zinc-100 mb-1">Готов к общению</h2>
+            <p class="text-xs text-zinc-400 mb-6">
+              Подключен профиль <span class="text-indigo-400 font-semibold">${getActiveProfile()?.name}</span>. Напишите любой запрос или выберите пример ниже:
+            </p>
+            <div class="w-full space-y-2 text-left">
+              <button class="starter-card w-full p-3 bg-zinc-900/60 hover:bg-zinc-800/80 border border-zinc-800 hover:border-zinc-700 rounded-xl text-xs text-zinc-300 transition flex items-center justify-between">
+                <span>"Расскажи коротко о возможностях моделей ASI"</span>
+                <svg class="w-4 h-4 text-zinc-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+              </button>
+              <button class="starter-card w-full p-3 bg-zinc-900/60 hover:bg-zinc-800/80 border border-zinc-800 hover:border-zinc-700 rounded-xl text-xs text-zinc-300 transition flex items-center justify-between">
+                <span>"Напиши функцию на Python для параллельной загрузки данных"</span>
+                <svg class="w-4 h-4 text-zinc-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+              </button>
+              <button class="starter-card w-full p-3 bg-zinc-900/60 hover:bg-zinc-800/80 border border-zinc-800 hover:border-zinc-700 rounded-xl text-xs text-zinc-300 transition flex items-center justify-between">
+                <span>"Проверь подключение к текущему API и опиши свой контекст"</span>
+                <svg class="w-4 h-4 text-zinc-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+              </button>
+            </div>
+          </div>
+        `;
+
+        container.querySelectorAll('.starter-card').forEach(btn => {
+          btn.onclick = () => {
+            const text = btn.querySelector('span').textContent.replace(/^"|"$/g, '');
+            document.getElementById('promptInput').value = text;
+            sendMessage();
+          };
+        });
+        return;
+      }
+
+      chat.messages.forEach((msg, index) => {
+        const isUser = msg.role === 'user';
+        const msgDiv = document.createElement('div');
+        msgDiv.className = `flex gap-3 md:gap-4 max-w-4xl mx-auto ${isUser ? 'justify-end' : 'justify-start'}`;
+
+        const avatar = isUser
+          ? `<div class="w-7 h-7 rounded-xl bg-zinc-700 text-zinc-200 flex items-center justify-center shrink-0 text-xs font-bold order-2">Я</div>`
+          : `<div class="w-7 h-7 rounded-xl bg-gradient-to-tr from-indigo-600 to-purple-600 text-white flex items-center justify-center shrink-0 shadow-md shadow-indigo-600/20 order-1">
+              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+             </div>`;
+
+        const bubbleClasses = isUser
+          ? 'bg-indigo-600 text-white rounded-2xl rounded-tr-none px-4 py-3 text-sm shadow-md max-w-[85%] md:max-w-[75%] order-1'
+          : 'bg-zinc-900/90 border border-zinc-800 text-zinc-100 rounded-2xl rounded-tl-none px-4 py-3 text-sm shadow-md max-w-[90%] md:max-w-[85%] prose prose-invert order-2';
+
+        msgDiv.innerHTML = `
+          ${avatar}
+          <div class="${bubbleClasses} relative group">
+            <div class="message-body ${isUser ? 'whitespace-pre-wrap' : ''}">
+              ${isUser ? escapeHtml(msg.content) : renderMarkdown(msg.content)}
+            </div>
+
+            <!-- Copy message action button -->
+            <button class="btn-copy-msg absolute top-2 right-2 p-1.5 rounded-lg bg-zinc-800/80 border border-zinc-700 text-zinc-400 hover:text-zinc-100 opacity-0 group-hover:opacity-100 transition" title="Скопировать сообщение">
+              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
+            </button>
+          </div>
+        `;
+
+        msgDiv.querySelector('.btn-copy-msg').onclick = () => copyToClipboard(msg.content);
+
+        // Highlight code blocks
+        if (!isUser) {
+          msgDiv.querySelectorAll('pre code').forEach((block) => {
+            hljs.highlightElement(block);
+          });
+        }
+
+        container.appendChild(msgDiv);
+      });
+
+      // Auto scroll to bottom
+      container.scrollTop = container.scrollHeight;
+    }
+
+    async function sendMessage() {
+      const promptInput = document.getElementById('promptInput');
+      const text = promptInput.value.trim();
+      if (!text) return;
+
+      const profile = getActiveProfile();
+      if (!profile) {
+        showToast('Пожалуйста, выберите или настройте профиль API!', 'error');
+        return;
+      }
+
+      if (!profile.baseUrl) {
+        showToast('Укажите Base URL в настройках профиля!', 'error');
+        return;
+      }
+
+      const chat = getCurrentChat();
+      if (!chat) return;
+
+      // Add user message
+      chat.messages.push({
+        role: 'user',
+        content: text,
+        timestamp: Date.now()
+      });
+
+      // Update chat title if it's the first message
+      if (chat.messages.length === 1) {
+        chat.title = text.slice(0, 30) + (text.length > 30 ? '...' : '');
+        renderChatsList();
+      }
+
+      promptInput.value = '';
+      promptInput.style.height = 'auto';
+      updateCharCount();
+
+      // Placeholder for assistant response
+      const assistantMessage = {
+        role: 'assistant',
+        content: '',
+        timestamp: Date.now()
+      };
+      chat.messages.push(assistantMessage);
+
+      renderMessages();
+      saveChats();
+
+      // UI states for loading
+      const btnSend = document.getElementById('btnSendMessage');
+      const btnStop = document.getElementById('btnStopGeneration');
+      btnSend.classList.add('hidden');
+      btnStop.classList.remove('hidden');
+
+      const isStream = document.getElementById('chkStream').checked;
+      const temperature = parseFloat(document.getElementById('inputTemperature').value) || 0.7;
+      const systemPrompt = document.getElementById('systemPromptTextarea').value.trim();
+
+      abortController = new AbortController();
+
+      // Prepare request payload (OpenAI compatible schema)
+      const messagesPayload = [];
+      if (systemPrompt) {
+        messagesPayload.push({ role: 'system', content: systemPrompt });
+      }
+
+      // Append last 20 messages for context
+      const historySlice = chat.messages.slice(0, -1).slice(-20);
+      historySlice.forEach(m => {
+        messagesPayload.push({
+          role: m.role,
+          content: m.content
+        });
+      });
+
+      const requestBody = {
+        model: profile.model || 'default',
+        messages: messagesPayload,
+        temperature: temperature,
+        stream: isStream
+      };
+
+      // Construct endpoint URL
+      let fullUrl = profile.baseUrl.replace(/\/+$/, '');
+      const path = (profile.chatPath || '/v1/chat/completions').replace(/^\/*/, '/');
+      fullUrl += path;
+
+      // Headers setup
+      const headers = {
+        'Content-Type': 'application/json',
+      };
+
+      if (profile.apiKey) {
+        let authHeaderVal = (profile.authHeaderTemplate || 'Bearer {KEY}').replace('{KEY}', profile.apiKey.trim());
+        headers['Authorization'] = authHeaderVal;
+      }
+
+      try {
+        const response = await fetch(fullUrl, {
+          method: 'POST',
+          headers: headers,
+          body: JSON.stringify(requestBody),
+          signal: abortController.signal
+        });
+
+        if (!response.ok) {
+          let errText = '';
+          try {
+            const errJson = await response.json();
+            errText = errJson.error?.message || JSON.stringify(errJson);
+          } catch (e) {
+            errText = await response.text();
+          }
+          throw new Error(`Ошибка сервера (${response.status}): ${errText || response.statusText}`);
+        }
+
+        // Handle streaming response
+        if (isStream && response.body) {
+          const reader = response.body.getReader();
+          const decoder = new TextDecoder('utf-8');
+          let buffer = '';
+
+          while (true) {
+            const { done, value } = await reader.read();
+            if (done) break;
+
+            buffer += decoder.decode(value, { stream: true });
+            const lines = buffer.split('\n');
+            buffer = lines.pop(); // Keep incomplete line
+
+            for (const line of lines) {
+              const trimmed = line.trim();
+              if (!trimmed || trimmed.startsWith(':')) continue;
+
+              if (trimmed === 'data: [DONE]') {
+                break;
+              }
+
+              if (trimmed.startsWith('data: ')) {
+                const jsonStr = trimmed.slice(6);
+                try {
+                  const parsed = JSON.parse(jsonStr);
+                  const delta = parsed.choices?.[0]?.delta?.content || parsed.choices?.[0]?.text || '';
+                  if (delta) {
+                    assistantMessage.content += delta;
+                    renderMessages();
+                  }
+                } catch (jsonErr) {
+                  // Not complete JSON or alternative format, ignore chunk parse failure
+                }
+              }
+            }
+          }
+        } else {
+          // Standard JSON non-stream fallback
+          const data = await response.json();
+          const reply = data.choices?.[0]?.message?.content || data.choices?.[0]?.text || JSON.stringify(data);
+          assistantMessage.content = reply;
+          renderMessages();
+        }
+
+      } catch (err) {
+        if (err.name === 'AbortError') {
+          assistantMessage.content += '\n\n*(Генерация остановлена пользователем)*';
+        } else {
+          console.error("API Request Error:", err);
+          let errorNotice = `⚠️ **Ошибка запроса**: ${err.message}\n\n`;
+          
+          if (err.message.includes('Failed to fetch') || err.message.includes('NetworkError')) {
+            errorNotice += `**Возможные причины:**\n1. Сервер **${profile.baseUrl}** не разрешает запросы из браузера (CORS). Для исправления настройте CORS на сервере или используйте прокси.\n2. Неправильный URL или сервер временно недоступен.\n3. Проверьте правильность пути эндпоинта: \`${path}\`.`;
+          }
+          
+          assistantMessage.content = errorNotice;
+          showToast('Ошибка при запросе к модели', 'error');
+        }
+        renderMessages();
+      } finally {
+        saveChats();
+        btnSend.classList.remove('hidden');
+        btnStop.classList.add('hidden');
+        abortController = null;
+      }
+    }
+
+    function openProfileModal(profileToEdit = null) {
+      const modal = document.getElementById('profileModal');
+      modal.classList.remove('hidden');
+
+      const target = profileToEdit || getActiveProfile() || profiles[0];
+      currentlyEditingProfileId = target ? target.id : null;
+
+      renderProfileChips();
+      populateProfileForm(target);
+    }
+
+    function renderProfileChips() {
+      const container = document.getElementById('profileChipsContainer');
+      container.innerHTML = '';
+
+      profiles.forEach(p => {
+        const isEditing = p.id === currentlyEditingProfileId;
+        const chip = document.createElement('button');
+        chip.className = `px-3 py-1.5 rounded-xl text-xs font-medium border transition flex items-center gap-1.5 ${
+          isEditing 
+            ? 'bg-indigo-600/20 text-indigo-300 border-indigo-500/50' 
+            : 'bg-zinc-800 text-zinc-400 border-zinc-700/60 hover:text-zinc-200'
+        }`;
+        chip.innerHTML = `
+          <span>${escapeHtml(p.name)}</span>
+          ${p.id === activeProfileId ? '<span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>' : ''}
+        `;
+        chip.onclick = () => {
+          currentlyEditingProfileId = p.id;
+          populateProfileForm(p);
+          renderProfileChips();
+        };
+        container.appendChild(chip);
+      });
+    }
+
+    function populateProfileForm(p) {
+      if (!p) {
+        document.getElementById('editProfileName').value = '';
+        document.getElementById('editProfileModel').value = '';
+        document.getElementById('editProfileUrl').value = '';
+        document.getElementById('editProfileKey').value = '';
+        document.getElementById('editProfilePath').value = '/v1/chat/completions';
+        document.getElementById('editProfileAuthHeader').value = 'Bearer {KEY}';
+        document.getElementById('btnDeleteProfile').classList.add('hidden');
+        return;
+      }
+
+      document.getElementById('editProfileName').value = p.name || '';
+      document.getElementById('editProfileModel').value = p.model || '';
+      document.getElementById('editProfileUrl').value = p.baseUrl || '';
+      document.getElementById('editProfileKey').value = p.apiKey || '';
+      document.getElementById('editProfilePath').value = p.chatPath || '/v1/chat/completions';
+      document.getElementById('editProfileAuthHeader').value = p.authHeaderTemplate || 'Bearer {KEY}';
+
+      const btnDelete = document.getElementById('btnDeleteProfile');
+      if (profiles.length > 1) {
+        btnDelete.classList.remove('hidden');
+      } else {
+        btnDelete.classList.add('hidden');
+      }
+
+      document.getElementById('testConnectionStatus').textContent = 'Нажмите «Проверить связь» для валидации';
+      document.getElementById('testConnectionStatus').className = 'text-xs text-zinc-400';
+    }
+
+    function saveCurrentProfile() {
+      const name = document.getElementById('editProfileName').value.trim() || 'Без названия';
+      const model = document.getElementById('editProfileModel').value.trim() || 'default';
+      const baseUrl = document.getElementById('editProfileUrl').value.trim();
+      const apiKey = document.getElementById('editProfileKey').value.trim();
+      const chatPath = document.getElementById('editProfilePath').value.trim() || '/v1/chat/completions';
+      const authHeaderTemplate = document.getElementById('editProfileAuthHeader').value.trim() || 'Bearer {KEY}';
+
+      if (!baseUrl) {
+        showToast('Укажите Base URL для профиля!', 'warning');
+        return;
+      }
+
+      if (currentlyEditingProfileId) {
+        const p = profiles.find(item => item.id === currentlyEditingProfileId);
+        if (p) {
+          p.name = name;
+          p.model = model;
+          p.baseUrl = baseUrl;
+          p.apiKey = apiKey;
+          p.chatPath = chatPath;
+          p.authHeaderTemplate = authHeaderTemplate;
+          activeProfileId = p.id;
+        }
+      } else {
+        const newProf = {
+          id: 'custom_' + Date.now(),
+          name,
+          model,
+          baseUrl,
+          apiKey,
+          chatPath,
+          authHeaderTemplate
+        };
+        profiles.push(newProf);
+        activeProfileId = newProf.id;
+        currentlyEditingProfileId = newProf.id;
+      }
+
+      saveProfiles();
+      localStorage.setItem(STORAGE_KEY_ACTIVE_PROFILE, activeProfileId);
+      renderActiveProfileUI();
+      document.getElementById('profileModal').classList.add('hidden');
+      showToast('Профиль сохранен и активирован!', 'success');
+    }
+
+    async function testProfileConnection() {
+      const statusEl = document.getElementById('testConnectionStatus');
+      const baseUrl = document.getElementById('editProfileUrl').value.trim();
+      const path = (document.getElementById('editProfilePath').value.trim() || '/v1/chat/completions').replace(/^\/*/, '/');
+      const apiKey = document.getElementById('editProfileKey').value.trim();
+      const headerTpl = document.getElementById('editProfileAuthHeader').value.trim() || 'Bearer {KEY}';
+      const model = document.getElementById('editProfileModel').value.trim() || 'default';
+
+      if (!baseUrl) {
+        statusEl.textContent = '❌ Укажите Base URL';
+        statusEl.className = 'text-xs text-rose-400 font-medium';
+        return;
+      }
+
+      statusEl.textContent = '⏳ Проверка соединения...';
+      statusEl.className = 'text-xs text-amber-400 font-medium';
+
+      const fullUrl = baseUrl.replace(/\/+$/, '') + path;
+      const headers = {
+        'Content-Type': 'application/json'
+      };
+      if (apiKey) {
+        headers['Authorization'] = headerTpl.replace('{KEY}', apiKey);
+      }
+
+      try {
+        const testPayload = {
+          model: model,
+          messages: [{ role: 'user', content: 'Ping' }],
+          max_tokens: 5,
+          stream: false
+        };
+
+        const res = await fetch(fullUrl, {
+          method: 'POST',
+          headers: headers,
+          body: JSON.stringify(testPayload)
+        });
+
+        if (res.ok) {
+          statusEl.textContent = '✅ Соединение успешно установлено!';
+          statusEl.className = 'text-xs text-emerald-400 font-medium';
+        } else {
+          statusEl.textContent = `❌ Ошибка ${res.status}: ${res.statusText}`;
+          statusEl.className = 'text-xs text-rose-400 font-medium';
+        }
+      } catch (err) {
+        statusEl.textContent = `❌ Ошибка сети / CORS: ${err.message}`;
+        statusEl.className = 'text-xs text-rose-400 font-medium';
+      }
+    }
+
+    function setupEventListeners() {
+      // Toggle dropdown for profiles
+      const btnQuick = document.getElementById('btnQuickSelectProfile');
+      const dropdown = document.getElementById('quickProfileDropdown');
+      btnQuick.onclick = (e) => {
+        e.stopPropagation();
+        dropdown.classList.toggle('hidden');
+      };
+      document.addEventListener('click', (e) => {
+        if (!dropdown.contains(e.target) && !btnQuick.contains(e.target)) {
+          dropdown.classList.add('hidden');
+        }
+      });
+
+      // Settings and profile modal triggers
+      document.getElementById('btnOpenSettings').onclick = () => openProfileModal();
+      document.getElementById('btnOpenProfilesFromDropdown').onclick = () => {
+        dropdown.classList.add('hidden');
+        openProfileModal();
+      };
+      document.getElementById('btnCloseProfileModal').onclick = () => {
+        document.getElementById('profileModal').classList.add('hidden');
+      };
+      document.getElementById('btnSaveProfile').onclick = saveCurrentProfile;
+
+      document.getElementById('btnCreateNewProfile').onclick = () => {
+        currentlyEditingProfileId = null;
+        populateProfileForm(null);
+        renderProfileChips();
+      };
+
+      document.getElementById('btnDeleteProfile').onclick = () => {
+        if (profiles.length <= 1) {
+          showToast('Нельзя удалить единственный профиль', 'warning');
+          return;
+        }
+        profiles = profiles.filter(p => p.id !== currentlyEditingProfileId);
+        activeProfileId = profiles[0].id;
+        currentlyEditingProfileId = profiles[0].id;
+        saveProfiles();
+        renderProfileChips();
+        populateProfileForm(profiles[0]);
+        renderActiveProfileUI();
+        showToast('Профиль удален', 'info');
+      };
+
+      document.getElementById('btnTestConnection').onclick = testProfileConnection;
+
+      // API Key visibility toggle
+      const btnToggleKey = document.getElementById('btnToggleKeyVisibility');
+      btnToggleKey.onclick = () => {
+        const input = document.getElementById('editProfileKey');
+        input.type = input.type === 'password' ? 'text' : 'password';
+      };
+
+      // System Prompt Modal
+      document.getElementById('btnSystemPrompt').onclick = () => {
+        document.getElementById('systemPromptModal').classList.remove('hidden');
+      };
+      document.getElementById('btnCloseSystemPromptModal').onclick = () => {
+        document.getElementById('systemPromptModal').classList.add('hidden');
+      };
+      document.getElementById('btnSaveSystemPrompt').onclick = () => {
+        const val = document.getElementById('systemPromptTextarea').value.trim();
+        localStorage.setItem(STORAGE_KEY_SYSTEM_PROMPT, val);
+        document.getElementById('systemPromptModal').classList.add('hidden');
+        showToast('Системный промпт сохранен', 'success');
+      };
+
+      // Chat controls
+      document.getElementById('btnNewChat').onclick = createNewChat;
+      document.getElementById('btnClearAllChats').onclick = () => {
+        chats = [];
+        createNewChat();
+        showToast('История всех чатов очищена', 'info');
+      };
+
+      // Message submission & Textarea autosize
+      const promptInput = document.getElementById('promptInput');
+      promptInput.addEventListener('input', () => {
+        promptInput.style.height = 'auto';
+        promptInput.style.height = Math.min(promptInput.scrollHeight, 180) + 'px';
+        updateCharCount();
+      });
+
+      promptInput.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' && !e.shiftKey) {
+          e.preventDefault();
+          sendMessage();
+        }
+      });
+
+      document.getElementById('btnSendMessage').onclick = sendMessage;
+      document.getElementById('btnStopGeneration').onclick = () => {
+        if (abortController) {
+          abortController.abort();
+        }
+      };
+
+      // Sidebar mobile toggle
+      const btnToggleSidebar = document.getElementById('btnToggleSidebar');
+      const sidebar = document.getElementById('sidebar');
+      const backdrop = document.getElementById('sidebarBackdrop');
+
+      btnToggleSidebar.onclick = () => {
+        sidebar.classList.toggle('-translate-x-full');
+        backdrop.classList.toggle('hidden');
+      };
+
+      backdrop.onclick = closeMobileSidebar;
+    }
+
+    function closeMobileSidebar() {
+      document.getElementById('sidebar').classList.add('-translate-x-full');
+      document.getElementById('sidebarBackdrop').classList.add('hidden');
+    }
+
+    function updateCharCount() {
+      const len = document.getElementById('promptInput').value.length;
+      document.getElementById('charCount').textContent = `${len} символов`;
+    }
+
+    // Initialize application on page load
+    window.addEventListener('DOMContentLoaded', () => {
+      loadState();
+      renderActiveProfileUI();
+      renderChatsList();
+      renderMessages();
+      setupEventListeners();
+    });
+  </script>
+</body>
+</html>
+```
